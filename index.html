@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>西安旅游行程安排</title>
+    <style>
+        :root {
+            --primary-color: #c62f2f; /* 中国红 */
+            --secondary-color: #f5d76e; /* 金黄色 */
+            --dark-color: #2c3e50; /* 深蓝色 */
+            --light-color: #ecf0f1; /* 浅灰色 */
+            --accent-color: #e74c3c; /* 强调色 */
+            --text-color: #333; /* 文本颜色 */
+            --light-text: #7f8c8d; /* 浅色文本 */
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f9f9f9"/><path d="M0,50 Q25,25 50,50 T100,50" stroke="%23f0e6d2" fill="none" stroke-width="1"/></svg>');
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('zhonglou.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 120px 0 80px;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to top, #f9f9f9, transparent);
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 10%;
+            width: 80%;
+            height: 4px;
+            background-color: var(--secondary-color);
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        nav {
+            background-color: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            padding: 0 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            white-space: nowrap;
+        }
+
+        .nav-links li {
+            margin: 0 5px;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 18px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        main {
+            padding: 40px 0 80px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            color: var(--dark-color);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 1.5px;
+        }
+
+        .day-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .day-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .day-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .day-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .day-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .day-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timeline {
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 15px;
+            width: 3px;
+            background-color: var(--secondary-color);
+            border-radius: 1.5px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 30px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 8px;
+            top: 0;
+            width: 17px;
+            height: 17px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .timeline-content {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .timeline-content h4 {
+            color: var(--dark-color);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .timeline-content .note {
+            font-style: italic;
+            color: var(--light-text);
+            font-size: 0.95rem;
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 10px;
+            margin-top: 10px;
+        }
+
+        .recommendation {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffeeba;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .recommendation h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .recommendation ul {
+            padding-left: 20px;
+        }
+
+        .recommendation li {
+            margin-bottom: 5px;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .footer-text {
+            max-width: 600px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #a82626;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(198, 47, 47, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .highlight {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+
+            .day-header h3 {
+                font-size: 1.3rem;
+            }
+
+            .day-content {
+                padding: 20px;
+            }
+
+            .timeline-item {
+                padding-left: 40px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .section-title h2 {
+                font-size: 1.5rem;
+            }
+
+            .day-header {
+                padding: 15px 20px;
+            }
+
+            .day-header h3 {
+                font-size: 1.2rem;
+            }
+
+            .timeline-content h4 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>西安旅游行程安排</h1>
+            <p class="subtitle">探索千年古都的历史与文化</p>
+            <a href="#itinerary" class="btn">查看行程</a>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container nav-container">
+            <ul class="nav-links">
+                <li><a href="#overview" class="active">行程概览</a></li>
+                <li><a href="#day0">8月12日</a></li>
+                <li><a href="#day1">8月13日</a></li>
+                <li><a href="#day2">8月14日</a></li>
+                <li><a href="#day3">8月15日</a></li>
+                <li><a href="#recommendations">旅游建议</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section id="overview" class="container">
+            <div class="section-title">
+                <h2>行程概览</h2>
+            </div>
+            <div class="overview-content">
+                <p>这份西安旅游行程安排为您提供了为期4天的精彩旅程，涵盖了西安的主要景点、美食和文化体验。从抵达西安开始，我们为您精心规划了每一天的行程，让您能够充分感受这座千年古都的魅力。</p>
+                <br>
+                <p>行程亮点包括：</p>
+                <ul style="padding-left: 20px; margin-bottom: 30px;">
+                    <li>参观世界第八大奇迹 - <span class="highlight">秦始皇兵马俑</span></li>
+                    <li>游览唐代皇家园林 - <span class="highlight">华清宫</span>，观看震撼的《长恨歌》演出</li>
+                    <li>探索佛教名刹 - <span class="highlight">大雁塔</span>，感受盛唐气象</li>
+                    <li>漫步<span class="highlight">大唐不夜城</span>，欣赏绚丽的灯光秀</li>
+                    <li>品尝西安特色美食，如肉夹馍、Biangbiang面、羊肉泡馍等</li>
+                    <li>骑行<span class="highlight">西安城墙</span>，俯瞰古城风貌</li>
+                    <li>参观<span class="highlight">陕西历史博物馆</span>，了解陕西悠久历史</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="itinerary" class="container">
+            <div class="section-title">
+                <h2>详细行程</h2>
+            </div>
+
+            <div class="day-card" id="day0">
+                <div class="day-header" onclick="toggleDay('day0-content')">
+                    <h3>8月12日 - 抵达西安</h3>
+                    <span class="toggle-icon">+</span>
+                </div>
+                <div class="day-content" id="day0-content">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">17:20</div>
+                            <div class="timeline-content">
+                                <h4>抵达咸阳T5机场</h4>
+                                <p>乘坐飞机抵达西安咸阳国际机场T5航站楼。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">17:30 - 19:00</div>
+                            <div class="timeline-content">
+                                <h4>前往<span onclick="openBaiduMap(34.263959, 108.949531, '季枫国际酒店')" style="cursor: pointer; color: #1e88e5;">季枫国际酒店</span></h4>
+                                <p>乘坐地铁14号线（贺韶方向）→西安北站转地铁2号线（常宁宫方向）→钟楼站2口。</p>
+                                <p class="note">预计19:00左右到达酒店办理入住。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">19:30 之后</div>
+                            <div class="timeline-content">
+                                <h4>钟楼打卡/晚餐</h4>
+                                <p>拍钟楼的最佳机位在开元商城5楼的观景台(李宁专柜旁)，推荐品尝西安特色美食：</p>
+                                <ul>
+                                    <li>Biangbiang面/裤带面/油泼面</li>
+                                    <li>马波烧烤</li>
+                                    <li>老刘家羊肉泡馍</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-card" id="day1">
+                <div class="day-header" onclick="toggleDay('day1-content')">
+                    <h3>8月13日 - 博物馆与大唐不夜城</h3>
+                    <span class="toggle-icon">+</span>
+                </div>
+                <div class="day-content" id="day1-content">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">08:00 - 09:00</div>
+                            <div class="timeline-content">
+                                <h4>早餐</h4>
+                                <p>可以品尝昨晚没尝到的西安特色早餐。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">09:00 - 09:30</div>
+                            <div class="timeline-content">
+                                <h4>前往陕西历史博物馆</h4>
+                                <p>乘坐地铁2号线（常宁宫方向）→小寨站（E东北口）。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">09:30 - 12:30</div>
+                            <div class="timeline-content">
+                                <h4><span onclick="openBaiduMap(34.2305225430145, 108.96149527978129, '陕西历史博物馆')" style="cursor: pointer; color: #1e88e5;">陕西历史博物馆</span>/<span onclick="openBaiduMap(34.233359998525785, 108.94999903535626, '大兴善寺')" style="cursor: pointer; color: #1e88e5;">大兴善寺</span></h4>
+                                <p>参观陕西历史博物馆，了解陕西地区从史前时期到明清时期的历史文化。</p>
+                                <p class="note">可选：参观大兴善寺，感受佛教文化。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">13:00 - 15:00</div>
+                            <div class="timeline-content">
+                                <h4 onclick="openBaiduMap(34.22988113994123, 108.95474002234626, '赛格国际商场')" style="cursor: pointer; color: #1e88e5;">赛格国际商场</h4>
+                                <p>在赛格国际商场用餐，推荐尝试长安大牌档。</p>
+                                <p class="note">这里有亚洲最长室内扶梯、壮观的室内瀑布，还有卡点上下班的小黄鸭、黑天鹅可以打卡。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">15:30 - 17:30</div>
+                            <div class="timeline-content">
+                                <h4><span onclick="openBaiduMap(34.225887, 108.970950, '大雁塔')" style="cursor: pointer; color: #1e88e5;">大雁塔</span>/<span onclick="openBaiduMap(34.217404138302555, 108.9697840345524, '西安美术馆')" style="cursor: pointer; color: #1e88e5;">西安美术馆</span></h4>
+                                <p>游览大雁塔，参观大慈恩寺，感受唐代佛教建筑风格。</p>
+                                <p class="note">可选：参观西安美术馆，欣赏当代艺术作品，美术馆现场免费预约进场。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">17:30 - 18:30</div>
+                            <div class="timeline-content">
+                                <h4>晚餐</h4>
+                                <p>晚上翠华路的子午路张记肉夹馍必尝！！！</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">18:30 - 21:00</div>
+                            <div class="timeline-content">
+                                <h4><span onclick="openBaiduMap(34.220108, 108.970472, '大唐不夜城')" style="cursor: pointer; color: #1e88e5;">大唐不夜城</span>/<span onclick="openBaiduMap(34.218948697674456, 108.98072440752787, '大唐芙蓉园')" style="cursor: pointer; color: #1e88e5;">大唐芙蓉园</span></h4>
+                                <p>游览大唐不夜城，欣赏绚丽的灯光秀和精彩的表演。</p>
+                                <p class="note">晚上大唐不夜城可能人多，建议合理安排观看演出顺序。
+                                    大唐芙蓉园门票88r,随时可买，视情况而定。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-card" id="day2">
+                <div class="day-header" onclick="toggleDay('day2-content')">
+                    <h3>8月14日 - 兵马俑与华清宫</h3>
+                    <span class="toggle-icon">+</span>
+                </div>
+                <div class="day-content" id="day2-content">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">07:00 - 07:30</div>
+                            <div class="timeline-content">
+                                <h4>早餐</h4>
+                                <p>继续在回民街附近品尝当地特色早餐。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">07:30 - 08:00</div>
+                            <div class="timeline-content">
+                                <h4>前往秦始皇兵马俑</h4>
+                                <p>乘坐地铁6号线（纺织城方向）→纺织城站转9号线（秦陵西方向）→华清池站（C口）→打车到秦始皇兵马俑。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">09:10 - 13:00</div>
+                            <div class="timeline-content">
+                                <h4><span onclick="openBaiduMap(34.39201983017188, 109.2885269939108, '秦始皇兵马俑')" style="cursor: pointer; color: #1e88e5;">秦始皇兵马俑</span>/<span onclick="openBaiduMap(34.386658382483944, 109.26558903220517, '丽山园')" style="cursor: pointer; color: #1e88e5;">丽山园</span></h4>
+                                <p>参观世界第八大奇迹 - 秦始皇兵马俑，感受秦军的壮观阵容。</p>
+                                <p class="note">兵马俑中1号坑规模最大，人也最多，正常顺序是1号坑-3号坑-2号坑。建议请一位讲解，推荐1号坑进门左边有官方讲解/第一次检票后右边小亭子有旅游局讲解。兵马俑和丽山园景点之间有免费的摆渡车搭乘。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">13:00 - 14:00</div>
+                            <div class="timeline-content">
+                                <h4>午餐</h4>
+                                <p>可以选择在景区里吃，也可选择打车到华清宫旁的西安饭庄吃饭。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">14:30 - 19:00</div>
+                            <div class="timeline-content">
+                                <h4 onclick="openBaiduMap(34.364034472892094, 109.22161886393332, '华清宫')" style="cursor: pointer; color: #1e88e5;">华清宫</h4>
+                                <p>游览华清宫，了解唐代皇家园林的历史与文化，乘坐骊山索道欣赏骊山美景。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">19:00 - 20:30</div>
+                            <div class="timeline-content">
+                                <h4>晚餐</h4>
+                                <p>去华清宫旁的西安饭庄吃晚餐，或者去北边的西大街夜市。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">21:35 - 22:45</div>
+                            <div class="timeline-content">
+                                <h4>长恨歌演出</h4>
+                                <p>观看大型实景历史舞剧《长恨歌》，感受唐玄宗与杨贵妃的爱情故事。</p>
+                                <p class="note">结束后不出意外应该没有地铁了，可以打车回市区。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-card" id="day3">
+                <div class="day-header" onclick="toggleDay('day3-content')">
+                    <h3>8月15日 - 市区漫步与返程</h3>
+                    <span class="toggle-icon">+</span>
+                </div>
+                <div class="day-content" id="day3-content">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">9:00 - 14:00</div>
+                            <div class="timeline-content">
+                                <h4>市区citywalk路线</h4>
+                                <br>
+                                <h5>路线1：美食之旅</h5>
+                                <p>钟楼→鼓楼→回民街→高家大院→大皮院/麦苋街/红埠街→洒金桥</p>
+                                <p class="note">回民街的主街只拍照打卡就行，找美食去里面的大皮院、麦苋街、红埠街、洒金桥。高家大院（15元）里有皮影戏。</p>
+                                <br>
+                                <h5>路线2：美景之旅</h5>
+                                <p>西安城墙（南门永宁门）→西安城墙（东边中山门）→永兴坊</p>
+                                <p class="note">可以在城墙上租自行车骑行，全长13.74公里，骑完要2.5小时，建议骑一段即可。永兴坊也有各种小吃。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">14:00 - 15:30</div>
+                            <div class="timeline-content">
+                                <h4>前往咸阳T5机场</h4>
+                                <p>乘坐地铁2号线（草滩方向）→西安北站转地铁14号线（机场西方向）→机场(T5)站。</p>
+                                <p class="note">提前2小时到机场。</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">17:25 - 19:25</div>
+                            <div class="timeline-content">
+                                <h4>乘坐飞机返回南京</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="recommendations" class="container">
+            <div class="section-title">
+                <h2>美食推荐</h2>
+            </div>
+            <div class="recommendation">
+                <h4>北广济街</h4>
+                <ul>
+                    <li>老刘家牛羊肉泡馍</li>
+                    <li>清真宏顺祥卤汁凉粉</li>
+                    <li>老字号贾家肉丸糊辣汤</li>
+                    <li>清真全盛斋传统糕点(推荐椰蓉、椒盐、枣泥)</li>
+                </ul>
+            </div>
+            <div class="recommendation" style="margin-top: 15px;">
+                <h4>红埠街</h4>
+                <ul>
+                    <li>老乌家油茶麻花</li>
+                    <li>马洪小炒泡馍馆</li>
+                    <li>果渊斋老米家泡馍馆</li>
+                </ul>
+            </div>
+            <div class="recommendation" style="margin-top: 15px;">
+                <h4>大/小学习巷</h4>
+                <ul>
+                    <li>马波烤肉(推荐烤马面鱼)</li>
+                    <li>清真老贾家蜂蜜凉粽子(蜂蜜凉粽子和凉糕都可以尝)</li>
+                    <li>清真老靡家(推荐油糊馅)</li>
+                </ul>
+            </div>
+            <div class="recommendation" style="margin-top: 15px;">
+                <h4>洒金桥</h4>
+                <ul>
+                    <li>回坊刘明柿子糊塌·刘明元宵</li>
+                    <li>老李家明明肉丸糊辣汤</li>
+                    <li>杨天玉腊牛羊肉夹馍</li>
+                    <li>马文章胖子甑糕</li>
+                </ul>
+            </div>
+            <div class="recommendation" style="margin-top: 15px;">
+                <h4>其他零散地点的小吃</h4>
+                <ul>
+                    <li>子午路张记肉夹馍</li>
+                    <li>尚寨嫽扎咧面馆(biangbiang面、裤带面、油泼面)</li>
+                    <li>正宗裤带面</li>
+                    <li>张文国梆梆肉葫芦头泡馍</li>
+                    <li>冰峰、茶话弄(西安本地茶饮)</li>
+                </ul>
+            </div>
+            <div class="recommendation" style="margin-top: 15px;">
+                <h4>饭店推荐</h4>
+                <ul>
+                    <li>长安大牌档(推荐葫芦鸡、关中六小碗、金汤菊花锅、妃子笑和毛笔酥<好看>，饭店里有表演)</li>
+                    <li>西安饭庄(推荐葫芦鸡、金线油塔、紫阳蒸盆子)</li>
+                    <li>莲花餐饮</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-logo">西安旅游</div>
+            <p class="footer-text">希望这份行程安排能帮助您度过一个愉快的西安之旅。如有任何问题或建议，欢迎联系我们。</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-weixin"></i></a>
+                <a href="#"><i class="fab fa-weibo"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+            <p class="copyright">&copy; LJH. 保留所有权利。</p>
+        </div>
+    </footer>
+
+    <script>
+        // 打开百度地图app并定位到指定地点
+        function openBaiduMap(latitude, longitude, name) {
+            const isAndroid = navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Adr') > -1;
+            const isiOS = !!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+            let url = '';
+
+            if (isAndroid) {
+                url = `baidumap://map/marker?location=${latitude},${longitude}&title=${encodeURIComponent(name)}&content=${encodeURIComponent(name)}&traffic=1`;
+            } else if (isiOS) {
+                url = `baidumap://map/marker?location=${latitude},${longitude}&title=${encodeURIComponent(name)}&content=${encodeURIComponent(name)}&coordinate=bd09ll&traffic=1`;
+            } else {
+                // 非移动设备，打开百度地图网页版
+                url = `https://api.map.baidu.com/marker?location=${latitude},${longitude}&title=${encodeURIComponent(name)}&content=${encodeURIComponent(name)}&output=html`;
+            }
+
+            window.location.href = url;
+        }
+        // 切换日期内容显示/隐藏
+        function toggleDay(dayId) {
+            const content = document.getElementById(dayId);
+            const icon = content.previousElementSibling.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.textContent = '+';
+            } else {
+                content.classList.add('active');
+                icon.textContent = '-';
+            }
+        }
+
+        // 导航链接点击事件
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // 移除所有链接的active类
+                document.querySelectorAll('.nav-links a').forEach(item => {
+                    item.classList.remove('active');
+                });
+                // 为当前点击的链接添加active类
+                this.classList.add('active');
+
+                // 如果点击的是日期导航，自动展开对应的日期内容
+                const href = this.getAttribute('href');
+                if (href.startsWith('#day')) {
+                    const dayId = href.substring(1);
+                    const contentId = dayId + '-content';
+                    const content = document.getElementById(contentId);
+                    const icon = content.previousElementSibling.querySelector('.toggle-icon');
+                     
+                    if (!content.classList.contains('active')) {
+                        content.classList.add('active');
+                        icon.textContent = '-';
+                    }
+                }
+            });
+        });
+
+        // 页面加载时，默认展开第一天的内容
+        document.addEventListener('DOMContentLoaded', function() {
+            // 展开第0天的内容
+            const day0Content = document.getElementById('day0-content');
+            const day0Icon = day0Content.previousElementSibling.querySelector('.toggle-icon');
+            day0Content.classList.add('active');
+            day0Icon.textContent = '-';
+
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+
+    <!-- 加载Font Awesome图标 -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
